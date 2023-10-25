@@ -25,7 +25,10 @@ fn main() {
 fn handle_response(mut stream: TcpStream){
 
     let response_data : &str = r"HTTP/1.1 200 OK\r\n\r\n";
-    let _ = stream.write(response_data.as_bytes());
+    match stream.write(response_data.as_bytes()) {
+        Ok(n) => println!("{n} bytes writed"),
+        Err(_) => println!("Error"),
+    }
     
     
     
