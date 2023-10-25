@@ -33,8 +33,9 @@ fn handle_response(mut stream: TcpStream) {
         Err(e) => println!("ERROR reading. Error: {e}"),
     }
 
-    match stream.write(response_data.as_bytes()) {
-        Ok(n) => println!("{n} bytes writed"),
-        Err(_) => println!("Error writing bytes"),
-    }
+   // match stream.write(response_data.as_bytes()) {
+   //     Ok(n) => println!("{n} bytes writed"),
+   //     Err(_) => println!("Error writing bytes"),
+   // }
+   stream.write_all(response_data.as_bytes()).unwrap();
 }
