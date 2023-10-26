@@ -32,12 +32,9 @@ fn handle_response(mut stream: TcpStream) {
 
             if parsed_request.path == "/" {
                 response_data = "HTTP/1.1 200 OK \r\n\r\n".into()
-            } 
-
-            else if parsed_request.path.starts_with("/echo") {
-
-               println!("{}",parsed_request.path.split_at(6).1);
-                let body:String  = parsed_request.path.split_at(6).1.into();
+            } else if parsed_request.path.starts_with("/echo") {
+                println!("{}", parsed_request.path.split_at(6).1);
+                let body: String = parsed_request.path.split_at(6).1.into();
                 let mut response = Response::default();
                 response.header_1 = "HTTP/1.1 200 OK\r\n".into();
                 response.content_type = "Content-Type: text/plain\r\n".into();
@@ -46,13 +43,17 @@ fn handle_response(mut stream: TcpStream) {
                 response.content_lenght.push_str("\r\n");
                 response.two_space = "\r\n".into();
                 response.body = body;
-                response.body.push_str("\r\n");
 
-                response_data =format!("{}{}{}{}{}",response.header_1,response.content_type,response.content_lenght,response.two_space,response.body);
-                println!("{}",response_data);
-            }
-            
-            else {
+                response_data = format!(
+                    "{}{}{}{}{}",
+                    response.header_1,
+                    response.content_type,
+                    response.content_lenght,
+                    response.two_space,
+                    response.body
+                );
+                println!("{}", response_data);
+            } else {
                 response_data = "HTTP/1.1 404 NOT FOUND \r\n\r\n".into();
             }
         }
@@ -82,12 +83,12 @@ struct RequestData {
     http_version: String,
 }
 #[derive(Default, Debug)]
-struct Response{
-    header_1 :String,
+struct Response {
+    header_1: String,
     content_type: String,
     content_lenght: String,
     two_space: String,
-    body: String
+    body: String,
 }
 
-fn parse_response(data: &str){}
+fn parse_response(data: &str) {}
