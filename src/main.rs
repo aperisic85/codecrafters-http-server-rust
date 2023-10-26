@@ -40,7 +40,7 @@ fn handle_response(mut stream: TcpStream) {
                 let body:String  = parsed_request.path.split_at(6).1.into();
                 let mut response = Response::default();
                 response.header_1 = "HTTP/1.1 200 OK\r\n".into();
-                response.content_type = "Content-Type: text-plain".into();
+                response.content_type = "Content-Type: text/plain\r\n".into();
                 response.content_lenght = "Content-Length:".into();
                 response.content_lenght.push_str(&body.len().to_string());
                 response.content_lenght.push_str("\r\n");
