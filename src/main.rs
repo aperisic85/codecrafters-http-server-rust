@@ -28,8 +28,9 @@ fn handle_response(mut stream: TcpStream) {
             println!("Readed {bytes_no} bytes");
 
             let data_rec: String = String::from_utf8(buffer.to_vec()).unwrap();
-            let splited: Vec<_> = data_rec.split_whitespace().collect();
-            if splited[1] == "/" {
+            let parsed_request = parse_request(data_rec);
+
+            if parsed_request.path == "/" {
                 response_data = "HTTP/1.1 200 OK \r\n\r\n".into()
             } else {
                 response_data = "HTTP/1.1 404 NOT FOUND \r\n\r\n".into();
@@ -44,11 +45,19 @@ fn handle_response(mut stream: TcpStream) {
     }
 }
 
+fn parse_request(received: String) -> RequestData {
+    let lines: Vec<_> = received.lines().collect();
+    let mut parsed_data = RequestData::default();
+    let splited: Vec<_> = lines[0].split_whitespace().collect();
+    parsed_data.method = splited[0].into();
+    parsed_data.path = splited[1].into();
+    parsed_data.http_version = splited[2].into();
 
-
-fn parse_request(){}
+    parsed_data
+}
+#[derive(Default, Debug)]
 struct RequestData {
-method: String,
-path: String,
-http_version: String
+    method: String,
+    path: String,
+    http_version: String,
 }
