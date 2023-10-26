@@ -20,7 +20,7 @@ fn main() {
 }
 
 fn handle_response(mut stream: TcpStream) {
-    let response_data: &str = r"HTTP/1.1 200 OK\r\n\r\n";
+    let response_data: &str = "HTTP/1.1 200 OK \r\n\r\n";
     let mut buffer = [0; 2048];
 
     match stream.read(&mut buffer[..]) {
