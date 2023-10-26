@@ -47,6 +47,7 @@ fn handle_response(mut stream: TcpStream) {
                 response.body = body;
 
                 response_data =format!("{}{}{}{}{}",response.header_1,response.content_type,response.content_lenght,response.two_space,response.body);
+                println!("{}",response_data);
             }
             
             else {
