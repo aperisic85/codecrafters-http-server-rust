@@ -44,7 +44,7 @@ fn handle_response(mut stream: TcpStream) {
                 response.content_lenght = "Content-Length:".into();
                 response.content_lenght.push_str(&body.len().to_string());
                 response.content_lenght.push_str("\r\n");
-                response.two_space = "\r\n\r\n".into();
+                response.two_space = "\r\n".into();
                 response.body = body;
                 response.body.push_str("\r\n");
 
