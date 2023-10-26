@@ -39,7 +39,7 @@ fn handle_response(mut stream: TcpStream) {
                println!("{}",parsed_request.path.split_at(6).1);
                 let body:String  = parsed_request.path.split_at(6).1.into();
                 let mut response = Response::default();
-                response.header_1 = "HTTP/1.1 200 OK \r\n".into();
+                response.header_1 = "HTTP/1.1 200 OK".into();
                 response.content_type = "text-plain\r\n".into();
                 response.content_lenght = body.len().to_string();
                 response.content_lenght.push_str("\r\n");
