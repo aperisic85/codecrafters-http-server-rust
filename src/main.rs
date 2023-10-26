@@ -36,13 +36,13 @@ fn handle_response(mut stream: TcpStream) {
 
             else if parsed_request.path.starts_with("/echo") {
 
-               println!("{}",parsed_request.path.split_at(4).1);
+               println!("{}",parsed_request.path.split_at(6).1);
                 let body:String  = parsed_request.path.split_at(6).1.into();
                 let mut response = Response::default();
                 response.header_1 = "HTTP/1.1 200 OK \r\n".into();
                 response.content_type = "text-plain".into();
                 response.content_lenght = body.len().to_string();
-                response.two_space = "\r\n".into();
+                response.two_space = "\r\n\r\n".into();
                 response.body = body;
 
                 response_data =format!("{}{}{}{}{}",response.header_1,response.content_type,response.content_lenght,response.two_space,response.body);
