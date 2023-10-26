@@ -37,7 +37,7 @@ fn handle_response(mut stream: TcpStream) {
             else if parsed_request.path.starts_with("/echo") {
 
                println!("{}",parsed_request.path.split_at(4).1);
-                let body:String  = parsed_request.path.split_at(4).1.into();
+                let body:String  = parsed_request.path.split_at(6).1.into();
                 let mut response = Response::default();
                 response.header_1 = "HTTP/1.1 200 OK \r\n".into();
                 response.content_type = "text-plain".into();
