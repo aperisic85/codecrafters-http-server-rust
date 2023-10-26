@@ -34,16 +34,18 @@ fn handle_response(mut stream: TcpStream) {
                 response_data = "HTTP/1.1 200 OK \r\n\r\n".into()
             } else if parsed_request.path.starts_with("/echo") {
                 println!("{}", parsed_request.path.split_at(6).1);
-                let body: String = parsed_request.path.split_at(6).1.into();
-                let mut response = Response::default();
+                let body: &str = parsed_request.path.split_at(6).1;
+
+                /* let mut response = Response::default();
                 response.header_1 = "HTTP/1.1 200 OK\r\n".into();
                 response.content_type = "Content-Type: text/plain\r\n".into();
                 response.content_lenght = "Content-Length:".into();
                 response.content_lenght.push_str(&body.len().to_string());
                 response.content_lenght.push_str("\r\n");
                 response.two_space = "\r\n".into();
-                response.body = body;
+                response.body = body.into(); */
 
+                let response = parse_response(body);
                 response_data = format!(
                     "{}{}{}{}{}",
                     response.header_1,
@@ -91,4 +93,15 @@ struct Response {
     body: String,
 }
 
-fn parse_response(data: &str) {}
+fn parse_response(data: &str) -> Response {
+    let mut response = Response::default();
+    response.header_1 = "HTTP/1.1 200 OK\r\n".into();
+    response.content_type = "Content-Type: text/plain\r\n".into();
+    response.content_lenght = "Content-Length:".into();
+    response.content_lenght.push_str(&data.len().to_string());
+    response.content_lenght.push_str("\r\n");
+    response.two_space = "\r\n".into();
+    response.body = data.into();
+
+    response
+}
