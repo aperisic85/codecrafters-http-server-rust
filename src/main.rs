@@ -1,6 +1,8 @@
 use std::io::{Read, Write};
 use std::net::{TcpListener, TcpStream};
 
+use bytes::buf;
+
 fn main() {
     println!("Logs from your program will appear here!");
 
@@ -20,7 +22,7 @@ fn main() {
 }
 
 fn handle_response(mut stream: TcpStream) {
-    let response_data: &str = "HTTP/1.1 200 OK \r\n\r\n";
+    let mut response_data: &str = "HTTP/1.1 200 OK \r\n\r\n";
     let mut buffer = [0; 2048];
 
     match stream.read(&mut buffer[..]) {
@@ -28,7 +30,16 @@ fn handle_response(mut stream: TcpStream) {
             println!("Readed {bytes_no} bytes");
 
             let data_rec: String = String::from_utf8(buffer.to_vec()).unwrap();
-            println!("Received from client: {data_rec}");
+            match data_rec.split_whitespace().next() {
+                Some(a) => {
+                    if a == "/" { response_data  = "HTTP/1.1 200 OK \r\n\r\n"}
+                    else {
+                        response_data  = "HTTP/1.1 404 NOT FOUND \r\n\r\n"
+                     }
+                },
+                None => println!("none"),
+            }
+          
         }
         Err(e) => println!("ERROR reading. Error: {e}"),
     }
