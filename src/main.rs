@@ -36,15 +36,6 @@ fn handle_response(mut stream: TcpStream) {
                 println!("{}", parsed_request.path.split_at(6).1);
                 let body: &str = parsed_request.path.split_at(6).1;
 
-                /* let mut response = Response::default();
-                response.header_1 = "HTTP/1.1 200 OK\r\n".into();
-                response.content_type = "Content-Type: text/plain\r\n".into();
-                response.content_lenght = "Content-Length:".into();
-                response.content_lenght.push_str(&body.len().to_string());
-                response.content_lenght.push_str("\r\n");
-                response.two_space = "\r\n".into();
-                response.body = body.into(); */
-
                 let response = parse_response(body);
                 response_data = format!(
                     "{}{}{}{}{}",
@@ -68,16 +59,6 @@ fn handle_response(mut stream: TcpStream) {
     }
 }
 
-fn parse_request(received: String) -> RequestData {
-    let lines: Vec<_> = received.lines().collect();
-    let mut parsed_data = RequestData::default();
-    let splited: Vec<_> = lines[0].split_whitespace().collect();
-    parsed_data.method = splited[0].into();
-    parsed_data.path = splited[1].into();
-    parsed_data.http_version = splited[2].into();
-
-    parsed_data
-}
 #[derive(Default, Debug)]
 struct RequestData {
     method: String,
@@ -91,6 +72,17 @@ struct Response {
     content_lenght: String,
     two_space: String,
     body: String,
+}
+
+fn parse_request(received: String) -> RequestData {
+    let lines: Vec<_> = received.lines().collect();
+    let mut parsed_data = RequestData::default();
+    let splited: Vec<_> = lines[0].split_whitespace().collect();
+    parsed_data.method = splited[0].into();
+    parsed_data.path = splited[1].into();
+    parsed_data.http_version = splited[2].into();
+
+    parsed_data
 }
 
 fn parse_response(data: &str) -> Response {
