@@ -29,7 +29,6 @@ fn handle_response(mut stream: TcpStream) {
 
             let data_rec: String = String::from_utf8(buffer.to_vec()).unwrap();
             let splited: Vec<_> = data_rec.split_whitespace().collect();
-            println!("{:?}", splited);
             if splited[1] == "/" {
                 response_data = "HTTP/1.1 200 OK \r\n\r\n"
             } else {
