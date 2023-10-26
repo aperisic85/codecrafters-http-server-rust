@@ -32,7 +32,23 @@ fn handle_response(mut stream: TcpStream) {
 
             if parsed_request.path == "/" {
                 response_data = "HTTP/1.1 200 OK \r\n\r\n".into()
-            } else {
+            } 
+
+            else if parsed_request.path.starts_with("/echo") {
+
+               println!("{}",parsed_request.path.split_at(4).1);
+                let body:String  = parsed_request.path.split_at(4).1.into();
+                let mut response = Response::default();
+                response.header_1 = "HTTP/1.1 200 OK \r\n".into();
+                response.content_type = "text-plain".into();
+                response.content_lenght = body.len().to_string();
+                response.two_space = "\r\n".into();
+                response.body = body;
+
+                response_data =format!("{}{}{}{}{}",response.header_1,response.content_type,response.content_lenght,response.two_space,response.body);
+            }
+            
+            else {
                 response_data = "HTTP/1.1 404 NOT FOUND \r\n\r\n".into();
             }
         }
@@ -61,3 +77,13 @@ struct RequestData {
     path: String,
     http_version: String,
 }
+#[derive(Default, Debug)]
+struct Response{
+    header_1 :String,
+    content_type: String,
+    content_lenght: String,
+    two_space: String,
+    body: String
+}
+
+fn parse_response(data: &str){}
