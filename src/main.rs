@@ -35,7 +35,7 @@ fn handle_response(mut stream: TcpStream) {
             } else if parsed_request.path.starts_with("/echo") {
                 println!(
                     "{}",
-                    parsed_request.path.split_at(parsed_request.path.len()).1
+                    parsed_request.path.split_at(6).1
                 );
                 let body: &str = parsed_request.path.split_at(parsed_request.path.len()).1;
 
