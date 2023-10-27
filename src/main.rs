@@ -61,7 +61,7 @@ fn handle_response(mut stream: TcpStream) {
                     response.two_space,
                     body
                 );
-                println!("{}", response_data);
+                println!("PRINT RESPONSE::::::{}", response_data);
             } else {
                 response_data = "HTTP/1.1 404 NOT FOUND \r\n\r\n".into();
             }
@@ -99,7 +99,6 @@ fn parse_request(received: String) -> RequestData {
     let splited: Vec<_> = lines[0].split_whitespace().collect();
     let host: Vec<_> = lines[1].split(":").collect();
     let user_agent: Vec<_> = lines[2].split(":").collect();
-    println!("line 1:::: {:?} \n line 2::::{:?}", host,user_agent);
     parsed_data.method = splited[0].into();
     parsed_data.path = splited[1].into();
     parsed_data.http_version = splited[2].into();
