@@ -33,10 +33,25 @@ fn handle_response(mut stream: TcpStream) {
             if parsed_request.path == "/" {
                 response_data = "HTTP/1.1 200 OK \r\n\r\n".into()
             } else if parsed_request.path.starts_with("/echo") {
-                println!("{}", parsed_request.path.split_at(6).1);
-                let body: &str = parsed_request.path.split_at(6).1;
+                println!(
+                    "{}",
+                    parsed_request.path.split_at(parsed_request.path.len()).1
+                );
+                let body: &str = parsed_request.path.split_at(parsed_request.path.len()).1;
 
                 let response = parse_response(body);
+                response_data = format!(
+                    "{}{}{}{}{}",
+                    response.header_1,
+                    response.content_type,
+                    response.content_lenght,
+                    response.two_space,
+                    response.body
+                );
+                println!("{}", response_data);
+            } else if parsed_request.path.starts_with("/user-agent") {
+                //let body: &str = parsed_request.path.split_at(parsed_request.path.len()).1;
+                let response = parse_response_agent(parsed_request);
                 response_data = format!(
                     "{}{}{}{}{}",
                     response.header_1,
@@ -64,12 +79,15 @@ struct RequestData {
     method: String,
     path: String,
     http_version: String,
+    host: String,
+    user_agent: String,
 }
 #[derive(Default, Debug)]
 struct Response {
     header_1: String,
     content_type: String,
     content_lenght: String,
+
     two_space: String,
     body: String,
 }
@@ -78,9 +96,13 @@ fn parse_request(received: String) -> RequestData {
     let lines: Vec<_> = received.lines().collect();
     let mut parsed_data = RequestData::default();
     let splited: Vec<_> = lines[0].split_whitespace().collect();
+    let host: Vec<_> = lines[2].split(":").collect();
+    let user_agent: Vec<_> = lines[3].split(":").collect();
     parsed_data.method = splited[0].into();
     parsed_data.path = splited[1].into();
     parsed_data.http_version = splited[2].into();
+    parsed_data.host = host[1].into();
+    parsed_data.user_agent = user_agent[1].into();
 
     parsed_data
 }
@@ -94,6 +116,21 @@ fn parse_response(data: &str) -> Response {
     response.content_lenght.push_str("\r\n");
     response.two_space = "\r\n".into();
     response.body = data.into();
+
+    response
+}
+
+fn parse_response_agent(data: RequestData) -> Response {
+    let mut response = Response::default();
+    response.header_1 = "HTTP/1.1 200 OK\r\n".into();
+    response.content_type = "Content-Type: text/plain\r\n".into();
+    response.content_lenght = "Content-Length:".into();
+    response
+        .content_lenght
+        .push_str(&data.user_agent.len().to_string());
+    response.content_lenght.push_str("\r\n");
+    response.two_space = "\r\n".into();
+    response.body = data.user_agent;
 
     response
 }
