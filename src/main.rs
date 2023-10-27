@@ -37,7 +37,7 @@ fn handle_response(mut stream: TcpStream) {
                     "{}",
                     parsed_request.path.split_at(6).1
                 );
-                let body: &str = parsed_request.path.split_at(parsed_request.path.len()).1;
+                let body: &str = parsed_request.path.split_at(6).1;
 
                 let response = parse_response(body);
                 response_data = format!(
