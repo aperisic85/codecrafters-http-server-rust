@@ -50,6 +50,7 @@ fn handle_response(mut stream: TcpStream) {
                 println!("{}", response_data);
             } else if parsed_request.path.starts_with(USERAGENT) {
                 //let body: &str = parsed_request.path.split_at(parsed_request.path.len()).1;
+                println!("{}", parsed_request.user_agent);
                 let response = parse_response_agent(&parsed_request);
                 let body: &str = &parsed_request.path.split_at(USERAGENT.len()).1;
                 response_data = format!(
