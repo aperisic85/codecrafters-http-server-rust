@@ -1,31 +1,37 @@
-use std::io::{Read, Write};
-use std::net::{TcpListener, TcpStream};
+use tokio::io::{AsyncRead, AsyncWrite, AsyncWriteExt};
+use tokio::net::{TcpListener, TcpStream};
+use std::io;
 
 const USERAGENT: &str = "/user-agent";
 const ECHO: &str = "/echo";
-fn main() {
+
+#[tokio::main]
+async fn main() {
     println!("Logs from your program will appear here!");
 
-    let listener = TcpListener::bind("127.0.0.1:4221").unwrap();
+    let listener = TcpListener::bind("127.0.0.1:4221").await.unwrap();
 
-    for stream in listener.incoming() {
-        match stream {
-            Ok(stream) => {
-                println!("accepted new connection");
-                handle_response(stream);
-            }
-            Err(e) => {
-                println!("error: {}", e);
-            }
+    loop {
+    
+        match  listener.accept().await {
+             
+                Ok((stream,adress)) => {
+                    println!("accepted new connection");
+                    handle_response(stream).await;
+                }
+                Err(e) => {
+                    println!("error: {}", e);
+                }
+            
         }
     }
 }
 
-fn handle_response(mut stream: TcpStream) {
+async fn handle_response(mut stream: TcpStream) {
     let mut response_data: String = String::from("HTTP/1.1 200 OK \r\n\r\n");
     let mut buffer: [u8; 1024] = [0; 1024];
 
-    match stream.read(&mut buffer[..]) {
+    match stream.write(&mut buffer[..]).await {
         Ok(bytes_no) => {
             println!("Readed {bytes_no} bytes");
 
@@ -49,7 +55,6 @@ fn handle_response(mut stream: TcpStream) {
                 );
                 println!("{}", response_data);
             } else if parsed_request.path.starts_with(USERAGENT) {
-                //let body: &str = parsed_request.path.split_at(parsed_request.path.len()).1;
                 println!("{}", parsed_request.user_agent);
                 let response = parse_response_agent(&parsed_request);
                 response_data = format!(
@@ -60,7 +65,6 @@ fn handle_response(mut stream: TcpStream) {
                     response.two_space,
                     response.body,
                 );
-                println!("PRINT RESPONSE::::::{}", response_data);
             } else {
                 response_data = "HTTP/1.1 404 NOT FOUND \r\n\r\n".into();
             }
@@ -68,7 +72,7 @@ fn handle_response(mut stream: TcpStream) {
         Err(e) => println!("ERROR reading. Error: {e}"),
     }
 
-    match stream.write(response_data.as_bytes()) {
+    match stream.write(response_data.as_bytes()).await {
         Ok(n) => println!("{n} bytes writed"),
         Err(_) => println!("Error writing bytes"),
     }
