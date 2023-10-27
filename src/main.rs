@@ -1,6 +1,8 @@
 use std::io::{Read, Write};
 use std::net::{TcpListener, TcpStream};
 
+const USERAGENT: &str = "/user-agent";
+const ECHO: &str = "/echo";
 fn main() {
     println!("Logs from your program will appear here!");
 
@@ -32,11 +34,8 @@ fn handle_response(mut stream: TcpStream) {
 
             if parsed_request.path == "/" {
                 response_data = "HTTP/1.1 200 OK \r\n\r\n".into()
-            } else if parsed_request.path.starts_with("/echo") {
-                println!(
-                    "{}",
-                    parsed_request.path.split_at(6).1
-                );
+            } else if parsed_request.path.starts_with(ECHO) {
+                println!("{}", parsed_request.path.split_at(ECHO.len()).1);
                 let body: &str = parsed_request.path.split_at(6).1;
 
                 let response = parse_response(body);
@@ -49,16 +48,17 @@ fn handle_response(mut stream: TcpStream) {
                     response.body
                 );
                 println!("{}", response_data);
-            } else if parsed_request.path.starts_with("/user-agent") {
+            } else if parsed_request.path.starts_with(USERAGENT) {
                 //let body: &str = parsed_request.path.split_at(parsed_request.path.len()).1;
-                let response = parse_response_agent(parsed_request);
+                let response = parse_response_agent(&parsed_request);
+                let body: &str = &parsed_request.path.split_at(USERAGENT.len()).1;
                 response_data = format!(
                     "{}{}{}{}{}",
                     response.header_1,
                     response.content_type,
                     response.content_lenght,
                     response.two_space,
-                    response.body
+                    body
                 );
                 println!("{}", response_data);
             } else {
@@ -83,13 +83,13 @@ struct RequestData {
     user_agent: String,
 }
 #[derive(Default, Debug)]
-struct Response {
+struct Response<'a> {
     header_1: String,
     content_type: String,
     content_lenght: String,
 
     two_space: String,
-    body: String,
+    body: &'a str,
 }
 
 fn parse_request(received: String) -> RequestData {
@@ -120,7 +120,7 @@ fn parse_response(data: &str) -> Response {
     response
 }
 
-fn parse_response_agent(data: RequestData) -> Response {
+fn parse_response_agent(data: &RequestData) -> Response {
     let mut response = Response::default();
     response.header_1 = "HTTP/1.1 200 OK\r\n".into();
     response.content_type = "Content-Type: text/plain\r\n".into();
@@ -130,7 +130,7 @@ fn parse_response_agent(data: RequestData) -> Response {
         .push_str(&data.user_agent.len().to_string());
     response.content_lenght.push_str("\r\n");
     response.two_space = "\r\n".into();
-    response.body = data.user_agent;
+    response.body = &data.user_agent;
 
     response
 }
