@@ -59,7 +59,7 @@ fn handle_response(mut stream: TcpStream) {
                     response.content_type,
                     response.content_lenght,
                     response.two_space,
-                    body
+                    response.body,
                 );
                 println!("PRINT RESPONSE::::::{}", response_data);
             } else {
