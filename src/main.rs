@@ -36,7 +36,7 @@ async fn handle_response(mut stream: TcpStream) {
             println!("Readed {bytes_no} bytes");
 
             let data_rec: String = String::from_utf8(buffer.to_vec()).unwrap();
-            println!("to debug___{}",data_rec);
+            println!("to debug --->  {}\n",data_rec);
             let parsed_request = parse_request(data_rec);
 
             if parsed_request.path == "/" {
