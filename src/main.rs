@@ -36,7 +36,7 @@ async fn handle_response(mut stream: TcpStream) {
             println!("Readed {bytes_no} bytes");
 
             let data_rec: String = String::from_utf8(buffer.to_vec()).unwrap();
-            let parsed_request = parse_request(data_rec).await;
+            let parsed_request = parse_request(data_rec);
 
             if parsed_request.path == "/" {
                 response_data = "HTTP/1.1 200 OK \r\n\r\n".into()
@@ -44,7 +44,7 @@ async fn handle_response(mut stream: TcpStream) {
                 println!("{}", parsed_request.path.split_at(ECHO.len()).1);
                 let body: &str = parsed_request.path.split_at(6).1;
 
-                let response = parse_response(body).await;
+                let response = parse_response(body);
                 response_data = format!(
                     "{}{}{}{}{}",
                     response.header_1,
@@ -56,7 +56,7 @@ async fn handle_response(mut stream: TcpStream) {
                 println!("{}", response_data);
             } else if parsed_request.path.starts_with(USERAGENT) {
                 println!("{}", parsed_request.user_agent);
-                let response = parse_response_agent(&parsed_request).await;
+                let response = parse_response_agent(&parsed_request);
                 response_data = format!(
                     "{}{}{}{}{}",
                     response.header_1,
@@ -96,7 +96,7 @@ struct Response<'a> {
     body: &'a str,
 }
 
-async fn parse_request(received: String) -> RequestData {
+ fn parse_request(received: String) -> RequestData {
     let lines: Vec<_> = received.lines().collect();
     let mut parsed_data = RequestData::default();
     let splited: Vec<_> = lines[0].split_whitespace().collect();
@@ -111,7 +111,7 @@ async fn parse_request(received: String) -> RequestData {
     parsed_data
 }
 
-async fn parse_response(data: &str) -> Response {
+ fn parse_response(data: &str) -> Response {
     let mut response = Response::default();
     response.header_1 = "HTTP/1.1 200 OK\r\n".into();
     response.content_type = "Content-Type: text/plain\r\n".into();
@@ -124,7 +124,7 @@ async fn parse_response(data: &str) -> Response {
     response
 }
 
-async fn parse_response_agent(data: &RequestData) -> Response {
+ fn parse_response_agent(data: &RequestData) -> Response {
     let mut response = Response::default();
     response.header_1 = "HTTP/1.1 200 OK\r\n".into();
     response.content_type = "Content-Type: text/plain\r\n".into();
