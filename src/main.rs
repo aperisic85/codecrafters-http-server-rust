@@ -1,6 +1,6 @@
-use tokio::io::{AsyncRead, AsyncWrite, AsyncWriteExt};
+use tokio::io::{AsyncWriteExt};
 use tokio::net::{TcpListener, TcpStream};
-use std::io;
+
 
 const USERAGENT: &str = "/user-agent";
 const ECHO: &str = "/echo";
@@ -15,7 +15,7 @@ async fn main() {
     
         match  listener.accept().await {
              
-                Ok((stream,adress)) => {
+                Ok((stream,_adress)) => {
                     println!("accepted new connection");
                     handle_response(stream).await;
                 }
