@@ -16,7 +16,7 @@ async fn main() {
         match  listener.accept().await {
              
                 Ok((stream,_adress)) => {
-                    println!("accepted new connection");
+                    println!("accepted new connection on add {}", _adress);
                     handle_response(stream).await;
                 }
                 Err(e) => {
@@ -36,6 +36,7 @@ async fn handle_response(mut stream: TcpStream) {
             println!("Readed {bytes_no} bytes");
 
             let data_rec: String = String::from_utf8(buffer.to_vec()).unwrap();
+            println!("to debug___{}",data_rec);
             let parsed_request = parse_request(data_rec);
 
             if parsed_request.path == "/" {
