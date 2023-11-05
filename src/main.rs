@@ -1,7 +1,6 @@
 use tokio::io::AsyncWriteExt;
 use tokio::net::{TcpListener, TcpStream};
 
-
 const USERAGENT: &str = "/user-agent";
 const ECHO: &str = "/echo";
 
@@ -12,17 +11,14 @@ async fn main() {
     let listener = TcpListener::bind("127.0.0.1:4221").await.unwrap();
 
     loop {
-    
-        match  listener.accept().await {
-             
-                Ok((stream,_adress)) => {
-                    println!("accepted new connection on add {}", _adress);
-                    handle_response(stream).await;
-                }
-                Err(e) => {
-                    println!("error: {}", e);
-                }
-            
+        match listener.accept().await {
+            Ok((stream, _adress)) => {
+                println!("accepted new connection on add {}", _adress);
+                handle_response(stream).await;
+            }
+            Err(e) => {
+                println!("error: {}", e);
+            }
         }
     }
 }
@@ -36,7 +32,7 @@ async fn handle_response(mut stream: TcpStream) {
             println!("Readed {bytes_no} bytes");
 
             let data_rec: String = String::from_utf8(buffer.to_vec()).unwrap();
-            println!("to debug --->  {}\n",data_rec);
+            println!("to debug --->  {}", data_rec);
             let parsed_request = parse_request(data_rec);
 
             if parsed_request.path == "/" {
@@ -97,7 +93,7 @@ struct Response<'a> {
     body: &'a str,
 }
 
- fn parse_request(received: String) -> RequestData {
+fn parse_request(received: String) -> RequestData {
     let lines: Vec<_> = received.lines().collect();
     let mut parsed_data = RequestData::default();
     let splited: Vec<_> = lines[0].split_whitespace().collect();
@@ -112,7 +108,7 @@ struct Response<'a> {
     parsed_data
 }
 
- fn parse_response(data: &str) -> Response {
+fn parse_response(data: &str) -> Response {
     let mut response = Response::default();
     response.header_1 = "HTTP/1.1 200 OK\r\n".into();
     response.content_type = "Content-Type: text/plain\r\n".into();
@@ -125,7 +121,7 @@ struct Response<'a> {
     response
 }
 
- fn parse_response_agent(data: &RequestData) -> Response {
+fn parse_response_agent(data: &RequestData) -> Response {
     let mut response = Response::default();
     response.header_1 = "HTTP/1.1 200 OK\r\n".into();
     response.content_type = "Content-Type: text/plain\r\n".into();
