@@ -52,7 +52,6 @@ fn handle_response(mut stream: TcpStream) {
                 //let body: &str = parsed_request.path.split_at(parsed_request.path.len()).1;
                 println!("{}", parsed_request.user_agent);
                 let response = parse_response_agent(&parsed_request);
-                let body: &str = &parsed_request.path.split_at(USERAGENT.len()).1;
                 response_data = format!(
                     "{}{}{}{}{}",
                     response.header_1,
@@ -97,8 +96,8 @@ fn parse_request(received: String) -> RequestData {
     let lines: Vec<_> = received.lines().collect();
     let mut parsed_data = RequestData::default();
     let splited: Vec<_> = lines[0].split_whitespace().collect();
-    let host: Vec<_> = lines[1].split(":").collect();
-    let user_agent: Vec<_> = lines[2].split(":").collect();
+    let host: Vec<_> = lines[1].split(": ").collect();
+    let user_agent: Vec<_> = lines[2].split(": ").collect();
     parsed_data.method = splited[0].into();
     parsed_data.path = splited[1].into();
     parsed_data.http_version = splited[2].into();
