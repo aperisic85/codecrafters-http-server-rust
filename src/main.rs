@@ -1,20 +1,18 @@
-use tokio::io::AsyncWriteExt;
-use tokio::net::{TcpListener, TcpStream};
+use std::io::{Read, Write};
+use std::net::{TcpListener, TcpStream};
 
 const USERAGENT: &str = "/user-agent";
 const ECHO: &str = "/echo";
-
-#[tokio::main]
-async fn main() {
+fn main() {
     println!("Logs from your program will appear here!");
 
-    let listener = TcpListener::bind("127.0.0.1:4221").await.unwrap();
+    let listener = TcpListener::bind("127.0.0.1:4221").unwrap();
 
-    loop {
-        match listener.accept().await {
-            Ok((stream, _adress)) => {
-                println!("accepted new connection on add {}", _adress);
-                handle_response(stream).await;
+    for stream in listener.incoming() {
+        match stream {
+            Ok(stream) => {
+                println!("accepted new connection");
+                handle_response(stream);
             }
             Err(e) => {
                 println!("error: {}", e);
@@ -23,16 +21,15 @@ async fn main() {
     }
 }
 
-async fn handle_response(mut stream: TcpStream) {
+fn handle_response(mut stream: TcpStream) {
     let mut response_data: String = String::from("HTTP/1.1 200 OK \r\n\r\n");
     let mut buffer: [u8; 1024] = [0; 1024];
 
-    match stream.write(&mut buffer[..]).await {
+    match stream.read(&mut buffer[..]) {
         Ok(bytes_no) => {
             println!("Readed {bytes_no} bytes");
 
             let data_rec: String = String::from_utf8(buffer.to_vec()).unwrap();
-            println!("to debug --->  {}", data_rec);
             let parsed_request = parse_request(data_rec);
 
             if parsed_request.path == "/" {
@@ -52,6 +49,7 @@ async fn handle_response(mut stream: TcpStream) {
                 );
                 println!("{}", response_data);
             } else if parsed_request.path.starts_with(USERAGENT) {
+                //let body: &str = parsed_request.path.split_at(parsed_request.path.len()).1;
                 println!("{}", parsed_request.user_agent);
                 let response = parse_response_agent(&parsed_request);
                 let body: &str = &parsed_request.path.split_at(USERAGENT.len()).1;
@@ -61,8 +59,9 @@ async fn handle_response(mut stream: TcpStream) {
                     response.content_type,
                     response.content_lenght,
                     response.two_space,
-                    body
+                    response.body,
                 );
+                println!("PRINT RESPONSE::::::{}", response_data);
             } else {
                 response_data = "HTTP/1.1 404 NOT FOUND \r\n\r\n".into();
             }
@@ -70,7 +69,7 @@ async fn handle_response(mut stream: TcpStream) {
         Err(e) => println!("ERROR reading. Error: {e}"),
     }
 
-    match stream.write(response_data.as_bytes()).await {
+    match stream.write(response_data.as_bytes()) {
         Ok(n) => println!("{n} bytes writed"),
         Err(_) => println!("Error writing bytes"),
     }
