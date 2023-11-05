@@ -1,5 +1,6 @@
 use std::io::{Read, Write};
 use std::net::{TcpListener, TcpStream};
+use std::thread;
 
 const USERAGENT: &str = "/user-agent";
 const ECHO: &str = "/echo";
@@ -12,7 +13,10 @@ fn main() {
         match stream {
             Ok(stream) => {
                 println!("accepted new connection");
-                handle_response(stream);
+
+                thread::spawn(|| {
+                    handle_response(stream);
+                });
             }
             Err(e) => {
                 println!("error: {}", e);
